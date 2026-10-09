@@ -1,0 +1,47 @@
+name: Build portfolio
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "assets/**"
+      - "README.md"
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"   # weekly refresh, optional
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-portfolio
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate SVGs and README
+        run: python scripts/build.py
+
+      - name: Validate SVGs
+        run: |
+          python - <<'PY'
+          import glob, xml.dom.minidom as m
+          for f in glob.glob("assets/*.svg"):
+              m.parse(f); print("ok", f)
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets README.md
+          git diff --cached --quiet || git commit -m "chore: rebuild portfolio [skip ci]"
+          git push

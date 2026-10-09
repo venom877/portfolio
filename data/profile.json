@@ -1,0 +1,40 @@
+{
+  "name": "Alex Carter",
+  "email": "hey@alexcarter.com",
+  "role": "Product Lead",
+  "company": "Apple Design",
+  "status": "Open to work",
+  "avatar": "images/avatar.jpg",
+  "booking_url": "https://cal.com/your-handle",
+  "cta_lines": ["Feel free to explore my portfolio and reach out", "—I’d love to connect!"],
+
+  "experience": [
+    {"title": "Product Lead at Apple", "meta": "2024 - On site - Full time"},
+    {"title": "Product Designer at Apple", "meta": "2023 - Hybrid - Part time"},
+    {"title": "Ui-Ux Designer at Apple", "meta": "2022 - Remote - Full time"}
+  ],
+
+  "music": {
+    "title": "Alex Playlist",
+    "url": "https://open.spotify.com/",
+    "covers": ["images/cover1.jpg", "images/cover2.jpg", "images/cover3.jpg"]
+  },
+
+  "reading": {
+    "title": "Dieter Rams the Complete Works",
+    "author": "Klaus Klemp",
+    "url": "https://www.goodreads.com/",
+    "cover": "images/book.jpg",
+    "spine_text": "dieter rams"
+  },
+
+  "map": {"city": "MONTREAL", "country": "CANADA", "coords": "45.5017° N, 73.5673° W"},
+
+  "process": [
+    {"title": "Discovery Call", "text": "In the first stage, we’ll have a Discovery Call to discuss your goals, needs, and project requirements. This helps us align our vision and set the foundation for a successful collaboration."},
+    {"title": "Proposal", "text": "I put together a scoped proposal with timeline, deliverables and pricing so everyone knows what success looks like before work starts."},
+    {"title": "Design", "text": "Research, flows and high-fidelity design in short cycles, with regular check-ins so feedback lands early."},
+    {"title": "Build", "text": "I work with your engineers to ship the design faithfully, covering edge cases, motion and accessibility."},
+    {"title": "Launch", "text": "We launch, measure what matters, and plan the next round of improvements together."}
+  ]
+}
