@@ -1,40 +1,66 @@
 {
-  "name": "Alex Carter",
-  "email": "hey@alexcarter.com",
-  "role": "Product Lead",
-  "company": "Apple Design",
-  "status": "Open to work",
+  "name": "Vijay Mane",
+  "email": "vijaymane.ajay@gmail.com",
+  "github": "github.com/venom877",
+  "github_url": "https://github.com/venom877",
+  "location": "Mumbai, India",
+
+  "intro": "I’m an",
+  "role": "L2 Service Desk Engineer",
+  "company": "BNP Paribas",
+  "status": "Open to AWS roles",
   "avatar": "images/avatar.jpg",
-  "booking_url": "https://cal.com/your-handle",
-  "cta_lines": ["Feel free to explore my portfolio and reach out", "—I’d love to connect!"],
+
+  "cta_label": "Email me",
+  "cta_url": "mailto:vijaymane.ajay@gmail.com",
+  "cta_lines": ["Targeting AWS Cloud Support roles —", "EC2, VPC, IAM, Linux and incident RCA."],
 
   "experience": [
-    {"title": "Product Lead at Apple", "meta": "2024 - On site - Full time"},
-    {"title": "Product Designer at Apple", "meta": "2023 - Hybrid - Part time"},
-    {"title": "Ui-Ux Designer at Apple", "meta": "2022 - Remote - Full time"}
+    {"title": "L2 Service Desk Engineer", "meta": "Rigved · BNP Paribas · 2026–Now", "state": "current"},
+    {"title": "System Administrator", "meta": "Domain IT Services · 2024–2026"},
+    {"title": "System Administrator", "meta": "PC Garage, Kolhapur · 2022–2024"}
   ],
 
-  "music": {
-    "title": "Alex Playlist",
-    "url": "https://open.spotify.com/",
-    "covers": ["images/cover1.jpg", "images/cover2.jpg", "images/cover3.jpg"]
-  },
+  "certs": [
+    {"title": "AWS Solutions Architect", "meta": "SAA-C03 · exam 24 Oct 2026", "state": "scheduled"},
+    {"title": "Google IT Support", "meta": "Coursera · in progress", "state": "progress"},
+    {"title": "ITIL v4 Foundation", "meta": "In progress", "state": "progress"},
+    {"title": "BCA, BVDU IMRDA", "meta": "Computer Applications · 2021"}
+  ],
 
-  "reading": {
-    "title": "Dieter Rams the Complete Works",
-    "author": "Klaus Klemp",
-    "url": "https://www.goodreads.com/",
-    "cover": "images/book.jpg",
-    "spine_text": "dieter rams"
-  },
+  "countdown": {"label": "AWS SAA-C03", "date": "2026-10-24"},
 
-  "map": {"city": "MONTREAL", "country": "CANADA", "coords": "45.5017° N, 73.5673° W"},
+  "skills": [
+    {"group": "AWS", "highlight": true, "items": ["EC2", "VPC", "ELB", "IAM", "Docker"]},
+    {"group": "Systems", "items": ["Linux", "Windows Server", "Active Directory"]},
+    {"group": "Network", "items": ["TCP/IP", "DNS", "DHCP", "VPN", "Wireshark", "Nmap"]},
+    {"group": "Automation", "items": ["Python", "PowerShell", "WinRM", "Git", "CI/CD"]},
+    {"group": "Ops", "items": ["ServiceNow", "Jira", "ITIL v4", "RCA"]}
+  ],
 
+  "map": {"city": "MUMBAI", "country": "INDIA", "coords": "19.0760° N, 72.8777° E"},
+
+  "process_label": "How I troubleshoot",
   "process": [
-    {"title": "Discovery Call", "text": "In the first stage, we’ll have a Discovery Call to discuss your goals, needs, and project requirements. This helps us align our vision and set the foundation for a successful collaboration."},
-    {"title": "Proposal", "text": "I put together a scoped proposal with timeline, deliverables and pricing so everyone knows what success looks like before work starts."},
-    {"title": "Design", "text": "Research, flows and high-fidelity design in short cycles, with regular check-ins so feedback lands early."},
-    {"title": "Build", "text": "I work with your engineers to ship the design faithfully, covering edge cases, motion and accessibility."},
-    {"title": "Launch", "text": "We launch, measure what matters, and plan the next round of improvements together."}
+    {"title": "Triage", "text": "Read the ticket, check impact and SLA, and find out what changed. The incident notes start here so the next person can pick up where I leave off."},
+    {"title": "Scope", "text": "Confirm the fault from the user’s side, then work out whether it affects one client, one server or the whole network path."},
+    {"title": "Trace", "text": "Follow the path with ping, nslookup, ipconfig and logs. When the cause is not obvious, I capture packets with Wireshark or scan with Nmap."},
+    {"title": "Fix", "text": "Apply the fix and verify it with the user. If the issue keeps coming back, I script it with Python or PowerShell over WinRM."},
+    {"title": "Document & escalate", "text": "Write up findings and the root cause. If it needs a higher team, escalate with full notes and next steps."}
+  ],
+
+  "projects": [
+    {"title": "IT Self-Service Recovery Portal", "status": "shipped",
+     "text": "Self-healing agent for recurring fixes (VPN MTU, Citrix sessions, cache cleanup, certificates) plus a console that runs scripts over WinRM from tickets.",
+     "tech": ["TypeScript", "PowerShell", "WinRM"],
+     "url": "https://github.com/venom877/it-self-service-recovery-portal"},
+    {"title": "OpsPulse", "status": "in-progress",
+     "text": "FastAPI service that loads synthetic incident data into SQL and serves REST endpoints for recurring errors, MTTR and SLA breaches, with tests.",
+     "tech": ["Python", "SQL", "FastAPI"],
+     "url": ""},
+    {"title": "AWS VPC + ALB lab", "status": "planned",
+     "text": "Public and private subnets, an ALB, EC2 behind it and least-privilege IAM roles, with a diagram and a short write-up.",
+     "tech": ["VPC", "EC2", "IAM"],
+     "url": ""}
   ]
 }

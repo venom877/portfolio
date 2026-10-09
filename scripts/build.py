@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate assets/*.svg and README.md from data/profile.json. Standard library only."""
 import base64, html, json, random, textwrap
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -37,9 +38,10 @@ def svg(w, h, body, label, css="", defs=""):
             f'role="img" aria-label="{esc(label)}"><title>{esc(label)}</title>'
             f'<style>{BASE_CSS}{css}</style><defs>{defs}</defs>{body}</svg>')
 
-def card(w, h, inner, label, css="", defs=""):
+def card(w, h, inner, label, css="", defs="", dashed=False):
     defs += f'<clipPath id="clip"><rect width="{w}" height="{h}" rx="24"/></clipPath>'
-    body = (f'<rect class="card" x=".75" y=".75" width="{w-1.5}" height="{h-1.5}" rx="24"/>'
+    dash = ' stroke-dasharray="6 6"' if dashed else ''
+    body = (f'<rect class="card"{dash} x=".75" y=".75" width="{w-1.5}" height="{h-1.5}" rx="24"/>'
             f'<g clip-path="url(#clip)">{inner}</g>')
     return svg(w, h, body, label, css, defs)
 
@@ -61,7 +63,7 @@ def hero():
     b.append('<path d="M20 8 L37 37 Q39 42 33 42 H7 Q1 42 3 37 Z" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/>')
     b.append('<circle cx="50" cy="45" r="3.5" class="acc"/>')
     b.append(f'<text x="64" y="43" font-size="15" text-decoration="underline">{esc(D["email"])}</text>')
-    s = 46; y1 = 135
+    s = 42; y1 = 135
     pre = "Hi, I’m"
     ax = tw(pre, s, 0.5) + 16
     b.append(f'<text x="0" y="{y1}" font-size="{s}" font-weight="600" letter-spacing="-1.5">{pre}</text>')
@@ -73,7 +75,7 @@ def hero():
     b.append(f'<text x="{ax+64+14}" y="{y1}" font-size="{s}" font-weight="600" letter-spacing="-1.5">{esc(D["name"])}!</text>')
     y2 = y1 + 60
     b.append(f'<text x="0" y="{y2}" font-size="{s}" font-weight="600" letter-spacing="-1.5">'
-             f'<tspan class="mute">I’m a </tspan><tspan>{esc(D["role"])}</tspan><tspan class="mute"> at</tspan></text>')
+             f'<tspan class="mute">{esc(D.get("intro", "I’m a"))} </tspan><tspan>{esc(D["role"])}</tspan><tspan class="mute"> at</tspan></text>')
     y3 = y2 + 60
     comp = D["company"] + "."
     b.append(f'<text x="0" y="{y3}" font-size="{s}" font-weight="600" letter-spacing="-1.5" class="acc">{esc(comp)}</text>')
@@ -87,24 +89,37 @@ def hero():
 def cta():
     W, H = 820, 70
     l1, l2 = D["cta_lines"]
-    b = (f'<rect x="0" y="6" width="146" height="52" rx="26" fill="var(--btn)"/>'
-         f'<text x="73" y="38" font-size="17" font-weight="500" text-anchor="middle" style="fill:var(--btnink)">Book a call</text>'
-         f'<text x="168" y="29" font-size="18">{esc(l1)}</text><text x="168" y="53" font-size="18">{esc(l2)}</text>')
-    return svg(W, H, b, "Book a call")
+    label = D.get("cta_label", "Book a call")
+    bw = tw(label, 17, 0.55) + 56
+    b = (f'<rect x="0" y="6" width="{bw:.0f}" height="52" rx="26" fill="var(--btn)"/>'
+         f'<text x="{bw/2:.0f}" y="38" font-size="17" font-weight="500" text-anchor="middle" style="fill:var(--btnink)">{esc(label)}</text>'
+         f'<text x="{bw+22:.0f}" y="29" font-size="18">{esc(l1)}</text><text x="{bw+22:.0f}" y="53" font-size="18">{esc(l2)}</text>')
+    return svg(W, H, b, label)
 
 # ---------------------------------------------------------------- cards
-def experience():
-    b = [pill(16, 16, "My Experience")]
-    items = D["experience"][:4]
-    y0 = 84
+def timeline_card(label, items, aria):
+    """states: done (filled) | current (accent glow) | scheduled (accent ring) | progress (dashed ring)"""
+    b = [pill(16, 16, label)]
+    items = items[:4]; y0 = 84
     last = y0 + (len(items) - 1) * 44
     b.append(f'<line x1="28" y1="{y0-5}" x2="28" y2="{last-5}" stroke="var(--ink)" stroke-width="1.5"/>')
     for i, it in enumerate(items):
-        y = y0 + i * 44
-        b.append(f'<circle cx="28" cy="{y-5}" r="5" fill="var(--ink)"/>')
+        y = y0 + i * 44; cy = y - 5; st = it.get("state", "done")
+        if st == "current":
+            dot = f'<circle cx="28" cy="{cy}" r="9" class="acc" opacity=".25"/><circle cx="28" cy="{cy}" r="5" class="acc"/>'
+        elif st == "scheduled":
+            dot = f'<circle cx="28" cy="{cy}" r="5" fill="var(--card)" stroke="var(--accent)" stroke-width="2"/>'
+        elif st == "progress":
+            dot = f'<circle cx="28" cy="{cy}" r="5" fill="var(--card)" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="2.5 2"/>'
+        else:
+            dot = f'<circle cx="28" cy="{cy}" r="5" fill="var(--ink)"/>'
+        b.append(dot)
         b.append(f'<text x="46" y="{y}" font-size="13.5" font-weight="500">{esc(it["title"])}</text>')
         b.append(f'<text x="46" y="{y+16}" font-size="11" class="sub">{esc(it["meta"])}</text>')
-    return card(CW, CH, "".join(b), "Experience")
+    return card(CW, CH, "".join(b), aria)
+
+def experience(): return timeline_card("My Experience", D["experience"], "Experience")
+def certs(): return timeline_card("Certifications & education", D["certs"], "Certifications and education")
 
 def music():
     m = D["music"]; c = (m.get("covers") or []) + [None] * 3
@@ -164,7 +179,7 @@ def process():
     css = (f".step,.act{{opacity:0;animation:cyc {total}s linear infinite}}"
            f"@keyframes cyc{{0%{{opacity:0}}1.5%{{opacity:1}}{100/n-1.5:.1f}%{{opacity:1}}{100/n:.1f}%{{opacity:0}}100%{{opacity:0}}}}"
            "@media (prefers-reduced-motion:reduce){.step,.act{animation:none}.s0,.a0{opacity:1}}")
-    b = [pill(16, 16, "How I work")]
+    b = [pill(16, 16, D.get("process_label", "How I work"))]
     for i, s in enumerate(steps):
         g = [f'<text x="24" y="92" font-size="16" font-weight="600">{i+1:02d} {esc(s["title"])}</text>']
         for j, ln in enumerate(textwrap.wrap(s["text"], 80)[:4]):
@@ -178,34 +193,104 @@ def process():
         b.append(f'<g class="act a{i}" style="animation-delay:{i*STEP_SECS}s">'
                  f'<rect x="{x+4}" y="184" width="{sw-8}" height="36" rx="18" fill="var(--btn)"/>'
                  f'<text x="{cx}" y="207" font-size="11.5" text-anchor="middle" style="fill:var(--btnink)">Step {i+1:02d}</text></g>')
-    return card(PW, CH, "".join(b), "How I work", css=css)
+    return card(PW, CH, "".join(b), D.get("process_label", "How I work"), css=css)
+
+# ---------------------------------------------------------------- new cards
+def chip(x, y, text, hl=False):
+    w = tw(text, 11, 0.55) + 18
+    st = ' stroke="var(--accent)" stroke-width="1.2"' if hl else ""
+    return (f'<rect class="pill" x="{x:.0f}" y="{y}" width="{w:.0f}" height="22" rx="11"{st}/>'
+            f'<text x="{x+9:.0f}" y="{y+15}" font-size="11">{esc(text)}</text>'), w
+
+def skills():
+    b = [pill(16, 16, "Skills")]
+    y, x0, maxx = 60, 88, PW - 16
+    for g in D["skills"]:
+        b.append(f'<text x="16" y="{y+15}" font-size="11" class="sub">{esc(g["group"])}</text>')
+        x = x0
+        for it in g["items"]:
+            c, w = chip(x, y, it, g.get("highlight"))
+            if x + w > maxx:
+                x = x0; y += 26; c, w = chip(x, y, it, g.get("highlight"))
+            b.append(c); x += w + 6
+        y += 34
+    if y > CH: print("warning: skills card overflows, drop an item or a group")
+    return card(PW, CH, "".join(b), "Skills")
+
+def countdown():
+    c = D["countdown"]; d = date.fromisoformat(c["date"]); days = (d - date.today()).days
+    big, size = (str(days), 76) if days > 0 else (("Today", 48) if days == 0 else ("Done", 48))
+    small = f'days until {c["label"]}' if days > 0 else (c["label"] + (" exam day" if days == 0 else " exam taken"))
+    b = [pill(16, 16, "Exam countdown"),
+         f'<text x="{CW/2}" y="140" font-size="{size}" font-weight="600" letter-spacing="-3" text-anchor="middle" class="acc">{big}</text>',
+         f'<text x="{CW/2}" y="168" font-size="13" text-anchor="middle">{esc(small)}</text>',
+         f'<text x="{CW/2}" y="188" font-size="11" text-anchor="middle" class="sub">{d.strftime("%d %b %Y")}</text>',
+         f'<text x="{CW/2}" y="222" font-size="9" text-anchor="middle" class="mute">Updated daily by GitHub Actions</text>']
+    return card(CW, CH, "".join(b), f"{days} days until {c['label']}")
+
+def findme():
+    b = [pill(16, 16, "Find me")]
+    rows = [("GitHub", D["github"]), ("Email", D["email"]), ("Location", D["location"])]
+    for i, (k, v) in enumerate(rows):
+        y = 84 + i * 48
+        b.append(f'<text x="20" y="{y}" font-size="10.5" class="sub">{k}</text>')
+        b.append(f'<text x="20" y="{y+18}" font-size="13" font-weight="500">{esc(v)}</text>')
+    return card(CW, CH, "".join(b), "Contact links")
+
+def project_card(p):
+    planned = p.get("status") == "planned"
+    labels = {"shipped": "Shipped", "in-progress": "In progress", "planned": "Planned"}
+    b = [pill(16, 16, labels.get(p["status"], p["status"]))]
+    y = 68
+    for ln in textwrap.wrap(p["title"], 22, max_lines=2, placeholder="…"):
+        b.append(f'<text x="18" y="{y}" font-size="15" font-weight="600">{esc(ln)}</text>'); y += 20
+    y += 4
+    for ln in textwrap.wrap(p["text"], 36, max_lines=5, placeholder="…"):
+        b.append(f'<text x="18" y="{y}" font-size="11" class="sub">{esc(ln)}</text>'); y += 15
+    x = 16
+    for t in p.get("tech", [])[:4]:
+        c, w = chip(x, CH - 38, t)
+        if x + w > CW - 12: break
+        b.append(c); x += w + 5
+    return card(CW, CH, "".join(b), p["title"], dashed=planned)
 
 # ---------------------------------------------------------------- readme
-def readme():
-    img = lambda f, w, alt: f'<img src="assets/{f}" width="{w}" alt="{esc(alt)}">'
+# Each row is a list of (card name, width). 32% + 32% + 32% or 32% + 66% fits GitHub's README width.
+LAYOUT = [
+    [("experience", "32%"), ("certs", "32%"), ("map", "32%")],
+    [("countdown", "32%"), ("skills", "66%")],
+    [("process", "66%"), ("findme", "32%")],
+]
+LINKS = {"findme": D.get("github_url"), "music": D.get("music", {}).get("url"), "reading": D.get("reading", {}).get("url")}
+
+def readme(card_names):
+    img = lambda f, w, alt: f'<img src="assets/{f}.svg" width="{w}" alt="{esc(alt)}">'
     link = lambda url, inner: f'<a href="{esc(url)}">{inner}</a>' if url else inner
-    r1 = " ".join([img("experience.svg", "32%", "Experience"),
-                   link(D["music"].get("url"), img("music.svg", "32%", "Music playlist")),
-                   link(D["reading"].get("url"), img("reading.svg", "32%", "Currently reading"))])
-    r2 = " ".join([img("map.svg", "32%", "Map"), img("process.svg", "66%", "How I work")])
-    return f"""<div align="center">
-
-{img("hero.svg", "100%", f'{D["name"]}, {D["role"]} at {D["company"]}')}
-
-{link(D["booking_url"], img("cta.svg", "100%", "Book a call"))}
-
-<p align="center">{r1}</p>
-<p align="center">{r2}</p>
-
-<sub><a href="mailto:{esc(D['email'])}">{esc(D['email'])}</a></sub>
-
-</div>
-"""
+    def row(items):
+        return '<p align="center">' + " ".join(link(u, img(n, w, n)) for n, w, u in items) + "</p>"
+    out = ['<div align="center">', "",
+           img("hero", "100%", f'{D["name"]}, {D["role"]} at {D["company"]}'), "",
+           link(D.get("cta_url"), img("cta", "100%", D.get("cta_label", "Contact"))), ""]
+    for r in LAYOUT:
+        items = [(n, w, LINKS.get(n)) for n, w in r if n in card_names]
+        if items: out += [row(items), ""]
+    projects = D.get("projects", [])
+    if projects:
+        out += ['<h3 align="center">Projects</h3>', ""]
+        for i in range(0, len(projects), 3):
+            items = [(f"project-{j+1}", "32%", projects[j].get("url")) for j in range(i, min(i + 3, len(projects)))]
+            out += [row(items), ""]
+    out += [f'<sub><a href="mailto:{esc(D["email"])}">{esc(D["email"])}</a></sub>', "", "</div>", ""]
+    return "\n".join(out)
 
 if __name__ == "__main__":
-    files = {"hero": hero(), "cta": cta(), "experience": experience(), "music": music(),
-             "reading": reading(), "map": map_card(), "process": process()}
-    for name, content in files.items():
+    for f in OUT.glob("*.svg"): f.unlink()          # drop cards for removed projects
+    cards = {"hero": hero(), "cta": cta(), "experience": experience(), "certs": certs(), "map": map_card(),
+             "countdown": countdown(), "skills": skills(), "process": process(), "findme": findme()}
+    if "music" in D: cards["music"] = music()
+    if "reading" in D: cards["reading"] = reading()
+    for i, p in enumerate(D.get("projects", [])): cards[f"project-{i+1}"] = project_card(p)
+    for name, content in cards.items():
         (OUT / f"{name}.svg").write_text(content, encoding="utf-8")
-    (ROOT / "README.md").write_text(readme(), encoding="utf-8")
-    print("Built:", ", ".join(files), "+ README.md")
+    (ROOT / "README.md").write_text(readme(set(cards)), encoding="utf-8")
+    print("Built:", ", ".join(cards), "+ README.md")
