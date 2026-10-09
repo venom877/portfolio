@@ -6,13 +6,13 @@
   "location": "Mumbai, India",
 
   "intro": "I’m an",
-  "role": "L2 Service Desk Engineer",
+  "role": "Devops Engineer & Cloud Support Engineer",
   "company": "BNP Paribas",
   "status": "Open to AWS roles",
   "avatar": "images/avatar.jpg",
 
   "cta_label": "Email me",
-  "cta_url": "mailto:vijaymane.ajay@gmail.com",
+  "cta_url": "mailto:vijaymane877@gmail.com",
   "cta_lines": ["Targeting AWS Cloud Support roles —", "EC2, VPC, IAM, Linux and incident RCA."],
 
   "experience": [
